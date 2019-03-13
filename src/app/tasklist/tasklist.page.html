@@ -13,12 +13,12 @@
 <ion-content padding>
 
   <ion-list>
-    <ion-item-sliding #slidingItem *ngFor="let task of tasks">
-      <ion-item [ngClass]="{taskDone: task.status == 'done'}">
+    <ion-item-sliding #slidingItem *ngFor="let task of tasks | async; let i = index">
+      <ion-item [ngClass]="{taskDone: task.status == 'done'}" [color]="i%2 == 0 ? 'listA' : 'listB'">
         {{task.title}}
       </ion-item>
       <ion-item-options slide="end">
-        <ion-button icon-only (click)="markAsDone(task)" color="secondary">
+        <ion-button icon-only (click)="markAsDone(task)" color="success">
           <ion-icon name="checkmark"></ion-icon>
         </ion-button>
         <ion-button icon-only (click)="removeTask(task)" color="danger">
@@ -45,9 +45,4 @@
     };
     firebase.initializeApp(config);
   </script>
--->
-
-
-<!--
-  I can't figure out the rules on page 89?
 -->

@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { NavComponent } from '@ionic/core';
-import { NavController } from '@ionic/angular';
+import { NavController, IonItemSliding } from '@ionic/angular';
 //import { IonItemSliding } from '@angular/core';
 import { Task } from './tasklist';
+import { Task as Home} from './tasklist';
 import { Observable } from 'rxjs';
 import { AngularFireList } from 'angularfire2/database';
 
 import { AngularFireDatabase } from 'angularfire2/database';
+import { isPromiseAlike } from 'q';
 
 @Component({
   selector: 'app-tasklist',
@@ -17,14 +19,8 @@ export class TasklistPage{
   tasks: Observable<any[ ]>;
   taskList: AngularFireList<Task>;
 
+
   constructor(public af: AngularFireDatabase) { 
-    this.tasks = Observable.create(observer => observer.next("hello"));
-    this.taskList[
-      {title: "Milk", status: "open"},
-      {title: "Eggs", status: "open"},
-      {title: "Syrup", status: "open"},
-      {title: "Pancake Mix", status: "open"}
-      ];
     this.taskList = this.af.list('/tasks');
     this.tasks = this.taskList.valueChanges();
   }
@@ -34,22 +30,27 @@ export class TasklistPage{
     if( theNewTask != "")
     {
       let newTaskRef = this.taskList.push(
-      { id: '', title: data.newTask, status: 'open' }
+      { id: '', title: theNewTask, status: 'open' }
       );
       newTaskRef.update( { id: newTaskRef.key } );
     }
   }
 
-  markAsDone(task: any){
-    task.status="done";
+  markAsDone(task: any, slide: IonItemSliding){
+    if (task.status != "done")
+    {
+      task.status = "done";
+    }
+    else
+    {
+      task.status = "open";
+    }
+    this.taskList.update(task.id, task);
   }
 
-  removeTask(task: any){
-    task.status="removed";
-    let index = this.tasks[task];
-    if (index > -1) {
-      this.tasks[index] = "";
-    }
+  removeTask(task: any, slide: IonItemSliding){
+    this.taskList.remove(task.id);
+    slide.close();
   }
 
 }
